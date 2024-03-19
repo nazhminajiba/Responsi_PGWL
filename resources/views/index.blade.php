@@ -11,7 +11,25 @@
         crossorigin=""/>
     </head>
     <body>
-        <h1>Ini Halaman Laravel PGWL</h1>
+    <div id="map" style="width: 100vw; height: 100vh;"></div>
 
-    </body>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+    // Map
+    var map = L.map('map').setView([51.505, -0.09], 13);
+
+    //Basemap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    //Marker
+    L.marker([51.5, -0.09]).addTo(map)
+        .bindPopup('Monas')
+        .openPopup();
+</script>
+
+
+ </body>
 </html>
