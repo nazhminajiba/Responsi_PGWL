@@ -1,43 +1,47 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+        <div class="container">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Dashboard') }}
+            </h2>
+        </div>
     </x-slot>
 
 
-        <div class="container py-12">
-        <div class="card shadow">
-            <div class="card-header">
-                <h3 class="card-title">Data</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col">
-                        <div class="alert alert-primary" role="alert">
-                            <h4><i class="fa-solid fa-location-dot"></i> Total Point</h4>
-                            <p style="font-size: 28pt">{{$total_points}}</p>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="alert alert-success" role="alert">
-                            <h4><i class="fa-solid fa-route"></i></i> Total Polyline</h4>
-                            <p style="font-size: 28pt">{{$total_polylines}}</p>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="alert alert-danger" role="alert">
-                            <h4><i class="fa-solid fa-draw-polygon"></i></i> Total Polygon</h4>
-                            <p style="font-size: 28pt">{{$total_polygons}}</p>
+    <div class="container py-12">
+    <div class="card shadow mb-4" style="background-color: #f8f9fa;">
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="card-title">Data</h3>
+        </div>
+        <div class="card-body">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card mb-4" style="background-color: #e9ecef;">
+                        <div class="card-body text-center">
+                            <h4 class="card-title"><i class="fa-solid fa-location-dot"></i> Total Titik Wisata</h4>
+                            <p class="display-4">{{$total_points}}</p>
                         </div>
                     </div>
                 </div>
-                    <hr />
-                    <p>
-                        Anda login sebagai <span class="fw-bold">{{ Auth::user()->name }}</span> dengan email <span class="fst-italic">{{ Auth::user()->email }}</span>
-                    </p>
+                <div class="col-md-4">
+                    <div class="card mb-4" style="background-color: #e9ecef;">
+                        <div class="card-body text-center">
+                            <h4 class="card-title"><i class="fa-solid fa-route"></i> Total Jalan</h4>
+                            <p class="display-4">{{$total_polylines}}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+
+                <p class="text-center">
+                    Anda login sebagai <span class="fw-bold">{{ Auth::user()->name }}</span> dengan email <span class="fst-italic">{{ Auth::user()->email }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
 
 </x-app-layout>

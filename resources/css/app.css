@@ -1,3 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+.judul {
+    background-color: #f0f0f0; /* Warna latar belakang */
+    color: #000000; /* Warna teks */
+    padding: 20px; /* Padding untuk memberikan ruang di sekitar teks */
+    border-radius: 10px; /* Untuk sudut yang lebih lembut */
+}

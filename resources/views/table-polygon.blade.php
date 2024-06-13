@@ -5,8 +5,9 @@
 
 <div class="container">
     <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title">Data Polygon</h5>
+            <a href="{{ route('index-public') }}" class="btn btn-dark">Map</a>
         </div>
         <div class="card-body">
             <table class="table table-bordered table-striped" id="example">

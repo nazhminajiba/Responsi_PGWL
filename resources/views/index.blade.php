@@ -163,12 +163,93 @@
     <script src="https://unpkg.com/terraformer-wkt-parser@1.1.2/terraformer-wkt-parser.js"></script>
     <script>
         // Map
-        var map = L.map('map').setView([-7.7956, 110.3695], 13);
-
-        //Basemap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        var map = L.map('map').setView([-7.715, 110.355], 11); // Koordinat dan tingkat zoom yang disesuaikan untuk wilayah Sleman
+        /* Tile Basemap */
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
+
+        var basemap1 = L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="DIVSIGUGM" target="_blank">DIVSIG UGM</a>',
+            }
+        );
+
+        var basemap2 = L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+                attribution: 'Tiles &copy; Esri | <a href="Latihan WebGIS" target="_blank">DIVSIG UGM</a>',
+            }
+        );
+
+        var basemap3 = L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+                attribution: 'Tiles &copy; Esri | <a href="Lathan WebGIS" target="_blank">DIVSIG UGM</a>',
+            }
+        );
+
+        var basemap4 = L.tileLayer(
+            "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png", {
+                attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+            }
+        );
+
+        basemap4.addTo(map);
+
+        var baseMaps = {
+            OpenStreetMap: basemap1,
+            "Esri World Street": basemap2,
+            "Esri Imagery": basemap3,
+            "Stadia Dark Mode": basemap4,
+        };
+
+        L.control.layers(baseMaps).addTo(map);
+
+        /* Scale Bar */
+        L.control
+            .scale({
+                maxWidth: 150,
+                position: "bottomright",
+            })
+            .addTo(map);
+            
+            // Deklarasikan variabel untuk menyimpan layer
+// Deklarasikan variabel untuk menyimpan layer
+var geoJsonLayer;
+
+// Load GeoJSON
+fetch('storage/geojson/Admin_Sleman.geojson')
+    .then(response => response.json())
+    .then(data => {
+        // Buat layer GeoJSON
+        geoJsonLayer = L.geoJSON(data, {
+            style: function(feature) {
+                // Mendapatkan warna acak
+                var randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+                return { fillColor: randomColor, color: 'black', weight: 0.2, fillOpacity: 0.7 };
+            },
+            onEachFeature: function(feature, layer) {
+                var content = "Kecamatan: " + feature.properties.KECAMATAN;
+                layer.on({
+                    click: function(e) {
+                        // Fungsi ketika objek diklik
+                        layer.bindPopup(content).openPopup();
+                    }
+                });
+            }
+        });
+
+        // Tambahkan layer ke kontrol lapisan
+        var overlayMaps = {
+            "<i class='fas fa-map-marker-alt'></i> Titik Wisata": point,
+            "<i class='fas fa-road'></i> Jalan": polyline,
+            "<i class='fas fa-draw-polygon'></i> Batas Administrasi": geoJsonLayer
+        };
+        L.control.layers(null, overlayMaps, { collapsed: false }).addTo(map);
+
+        // Tambahkan layer ke peta
+        geoJsonLayer.addTo(map);
+    });
 
         /* Digitize Function */
         var drawnItems = new L.FeatureGroup();
@@ -226,24 +307,20 @@
  /* GeoJSON Point */
  var point = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
-                var popupContent = "Nama: " + feature.properties.name + "<br>" +
-                    "Deskripsi: " + feature.properties.description + "<br>" +
-                    "Foto: <img src='{{ asset('storage/images/') }}/" + feature.properties.image + "'class='img-thumbnail' alt='...'>"
-                    + "<br>" +
-                    
-                    "<div class='d-flex flex-row mt-3'>" + 
-                    "<a href='{{ url('edit-point') }}/" + feature.properties.id +
-                    "' class='btn btn-warning me-2'><i class='fa-solid fa-pen-to-square'></i></a>" + 
+                var popupContent = "<div class='container'>" +
+                   "<p>Nama: " + feature.properties.name + "</p>" +
+                   "<p>Deskripsi: " + feature.properties.description + "</p>" +
+                   "<p>Foto: <img src='{{ asset('storage/images/') }}/" + feature.properties.image + "' class='img-thumbnail' alt='...' style='max-width: 200px;'></p>" +
+                   "<div class='d-flex flex-row mt-3'>" + 
+                   "<a href='{{ url('edit-point') }}/" + feature.properties.id + "' class='btn btn-warning me-2'><i class='fa-solid fa-pen-to-square'></i></a>" + 
+                   "<form action='{{ url('delete-point') }}/" + feature.properties.id + "' method='POST'>" +
+                   '{{ csrf_field() }}' +
+                   '{{ method_field('DELETE') }}' +
+                   "<button type='submit' class='btn btn-danger' onclick='return confirm(`Hapus kah?`)'><i class='fa-solid fa-trash-can'></i></button>" + 
+                   "</form>" + 
+                   "</div>" +
+                   "</div>";
 
-                    "<form action='{{ url('delete-point') }}/" + feature.properties.id + "' method='POST'>" +
-                    '{{ csrf_field() }}' +
-                    '{{ method_field('DELETE') }}' +
-                     
-                    "<button type='submit' class='btn btn-danger' onclick='return confirm(`Hapus kah?`)'><i class='fa-solid fa-trash-can'></i></button>" + 
-
-                    "</Form>" + 
-
-                    "</div>"
                     
 
                     ;
@@ -263,44 +340,68 @@
             map.addLayer(point);
         });
 
-        /* GeoJSON Polyline */
+        // Mendefinisikan style berdasarkan REMARK
+        function getStyle(feature) {
+            switch (feature.properties.REMARK) {
+                case 'jalan kolektor':
+                    return {
+                        color: "#B22222", weight: 3
+                    };
+                case 'jalan lain':
+                    return {
+                        color: "#B22222", weight: 2
+                    };
+                case 'jalan lokal':
+                    return {
+                        color: "#B22222", weight: 1
+                    };
+                case 'jalan setapak':
+                    return {
+                        color: "#B22222", weight: 0.5
+                    };
+                default:
+                    return {
+                        color: "#B22222", weight: 1
+                    };
+            }
+        }
+
+        // Membuat layer GeoJSON dengan style dan popup
         var polyline = L.geoJson(null, {
+            style: getStyle,
             onEachFeature: function(feature, layer) {
-                var popupContent = "Nama: " + feature.properties.name + "<br>" +
+                var popupContent = "Nama: " + feature.properties.REMARK + "<br>" +
                     "Deskripsi: " + feature.properties.description + "<br>" +
-                    "Foto: <img src='{{ asset('storage/images/') }}/" + feature.properties.image + "'class='img-thumbnail' alt='...'>"
-                    + "<br>" + 
-                    
-                    "<div class='d-flex flex-row mt-3'>" + 
+                    "Foto: <img src='{{ asset('storage/images/') }}/" + feature.properties.image +
+                    "' class='img-thumbnail' alt='...'>" + "<br>" +
+                    "<div class='d-flex flex-row mt-3'>" +
                     "<a href='{{ url('edit-polyline') }}/" + feature.properties.id +
                     "' class='btn btn-warning me-2'><i class='fa-solid fa-pen-to-square'></i></a>" +
-
-                    "<form action='{{ url('delete-polyline') }}/" + feature.properties.id + "' method='POST'>" +
+                    "<form action='{{ url('delete-polyline') }}/" + feature.properties.id +
+                    "' method='POST'>" +
                     '{{ csrf_field() }}' +
                     '{{ method_field('DELETE') }}' +
-
-                    "<button type='submit' class='btn btn-danger' onclick='return confirm(`Hapus kah?`)'><i class='fa-solid fa-trash-can'></i></button>"
-                    
-                    "</Form>" + 
-
-                    "</div>"
-                    
-                    ;
+                    "<button type='submit' class='btn btn-danger' onclick='return confirm(\"Yakin Anda akan menghapus data ini?\")'><i class='fa-solid fa-trash-can'></i></button>" +
+                    "</form>" +
+                    "</div>";
+                layer.bindPopup(popupContent);
                 layer.on({
-                    click: function(e) {
-                        polyline.bindPopup(popupContent);
-                    },
                     mouseover: function(e) {
-                        polyline.bindTooltip(feature.properties.name);
-                    },
+                        layer.bindTooltip(feature.properties.REMARK).openTooltip();
+                    }
                 });
-            },
-        });
-        $.getJSON("{{ route('api.polylines') }}", function(data) {
-            polyline.addData(data);
-            map.addLayer(polyline);
+            }
         });
 
+        // Mengambil data GeoJSON dari URL dan menambahkannya ke peta
+        fetch('{{ asset('storage/geojson/Jalan.geojson') }}')
+            .then(response => response.json())
+            .then(data => {
+                polyline.addData(data);
+                map.addLayer(polyline);
+            })
+            .catch(error => console.log(error));
+            
         /* GeoJSON polygon */
         var polygon = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
@@ -339,14 +440,14 @@
             map.addLayer(polygon);
         });
 
-        //layer control
-        var overlayMaps = {
-            "Point": point,
-            "Polyline": polyline,
-            "Polygon": polygon
-        };
+        // //layer control
+        //     var overlayMaps = {
+        //     "<i class='fas fa-map-marker-alt'></i> Titik Wisata": point,
+        //     "<i class='fas fa-road'></i> Jalan": polyline,
+        //     "<i class='fas fa-draw-polygon'></i> Batas Administrasi": polygon
+        // };
 
-        var layerControl = L.control.layers(null, overlayMaps, {collapsed: false}).addTo(map);
+        // var layerControl = L.control.layers(null, overlayMaps, {collapsed: false}).addTo(map);
 
     </script>
 @endsection

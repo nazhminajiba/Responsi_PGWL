@@ -9,7 +9,19 @@ class MapController extends Controller
    public function index()
    {
     $data = [
-        "title" => "Petaku"
+        "title" => "Sleman Kuy"
+    ];
+
+    if (auth()->check()) {
+        return view('index', $data);
+    } else {
+        return view('landing', $data);
+    }
+   }
+   public function map()
+   {
+    $data = [
+        "title" => "Sleman Kuy"
     ];
 
     if (auth()->check()) {
@@ -26,6 +38,14 @@ class MapController extends Controller
     ];
 
     return view('table', $data);
+   }
+   public function landing()
+   {
+    $data = [
+        "title" => "Landing",
+    ];
+
+    return view('landing', $data);
    }
 }
 

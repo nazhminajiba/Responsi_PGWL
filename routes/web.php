@@ -20,8 +20,10 @@ use App\Http\Controllers\DashboardController;
 |
 */
 
-Route::get('/',[MapController::class, 'index'])->name('index');
-Route::get('/table',[MapController::class, 'table'])->name('table');
+Route::get('/', [MapController::class, 'index'])->name('index');
+Route::get('/landing', [MapController::class, 'landing'])->name('landing');
+Route::get('/map', [MapController::class, 'map'])->name('index-public');
+Route::get('/table', [MapController::class, 'table'])->name('table');
 
 //Create Point
 Route::post('/store-point',[PointController::class, 'store'])->name('point-store');
